@@ -5,7 +5,22 @@ import ScoreForgeKit
 // the cross-platform engine can be exercised without the iOS app.
 // Usage: scoreforge-cli [presetName]
 
-let presetName = CommandLine.arguments.dropFirst().first ?? "points-race"
+let args = Array(CommandLine.arguments.dropFirst())
+
+// `scoreforge-cli export <preset>` prints shareable template JSON to stdout.
+if args.first == "export" {
+    let name = args.dropFirst().first ?? "points-race"
+    guard let schema = Presets.load(name) else {
+        FileHandle.standardError.write(Data("Unknown preset '\(name)'.\n".utf8))
+        exit(1)
+    }
+    let data = try TemplateTransfer.export(schema)
+    FileHandle.standardOutput.write(data)
+    print()
+    exit(0)
+}
+
+let presetName = args.first ?? "points-race"
 
 guard let schema = Presets.load(presetName) else {
     FileHandle.standardError.write(Data("Unknown preset '\(presetName)'. Options: \(Presets.identifiers.joined(separator: ", "))\n".utf8))
