@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "preset.category-yaku",
+  "name": "役マッチ（カテゴリ選択で加点）",
+  "description": "各ラウンドで成立した役を選ぶと、役に応じて加点。5ラウンド後に合計が最も高い人が勝ち。",
+  "origin": "preset",
+  "iconSystemName": "die.face.5",
+  "themeColorHex": "#7B2FF7",
+  "players": { "min": 2, "max": 6, "default": 3, "teams": false },
+  "structure": "rounds",
+  "rounds": { "fixed": true, "maxRounds": 5 },
+  "fields": [
+    { "id": "yaku", "label": "役", "type": "select", "scope": "perPlayerPerRound", "default": "none",
+      "options": [
+        { "value": "none", "label": "なし" },
+        { "value": "pair", "label": "ペア" },
+        { "value": "triple", "label": "スリーカード" },
+        { "value": "straight", "label": "ストレート" }
+      ]
+    }
+  ],
+  "actions": [],
+  "formulas": [
+    { "id": "roundScore", "label": "ラウンド得点", "scope": "perPlayerPerRound",
+      "expression": "field('yaku') == 'triple' ? 30 : (field('yaku') == 'straight' ? 20 : (field('yaku') == 'pair' ? 10 : 0))",
+      "display": true },
+    { "id": "total", "label": "合計", "scope": "perPlayer", "expression": "sumRounds('roundScore')", "display": true },
+    { "id": "rank", "label": "順位", "scope": "perPlayer", "expression": "rankDesc('total')", "display": true }
+  ],
+  "layout": {
+    "type": "vstack", "spacing": 12, "children": [
+      { "type": "playerHeader" },
+      { "type": "scoreTable", "rowField": "round", "columnGroup": "player", "cellFields": ["yaku", "roundScore"] },
+      { "type": "segmented", "field": "yaku", "label": "役" },
+      { "type": "label", "bind": "total", "style": { "fontScale": 1.4, "emphasis": true } }
+    ]
+  },
+  "winCondition": { "type": "afterNRounds", "scoreFormula": "total", "rounds": 5, "tieBreaker": "none" }
+}

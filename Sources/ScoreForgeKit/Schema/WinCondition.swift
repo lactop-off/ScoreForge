@@ -6,6 +6,12 @@ public struct WinCondition: Codable, Equatable {
     public var scoreFormula: String
     public var target: Double?
     public var rounds: Int?
+    /// Whether the lowest score wins. When nil it is derived from `type`
+    /// (`lowestTotal` → true, otherwise false). Set explicitly to model games
+    /// where the end trigger and the winning direction differ — e.g. a penalty
+    /// race that ends when someone *reaches* a threshold but the *lowest* total
+    /// wins (docs/design.md §7.7).
+    public var lowerWins: Bool?
     public var tieBreaker: TieBreaker
     public var customExpression: String?
 
@@ -14,6 +20,7 @@ public struct WinCondition: Codable, Equatable {
         scoreFormula: String,
         target: Double? = nil,
         rounds: Int? = nil,
+        lowerWins: Bool? = nil,
         tieBreaker: TieBreaker = .none,
         customExpression: String? = nil
     ) {
@@ -21,9 +28,13 @@ public struct WinCondition: Codable, Equatable {
         self.scoreFormula = scoreFormula
         self.target = target
         self.rounds = rounds
+        self.lowerWins = lowerWins
         self.tieBreaker = tieBreaker
         self.customExpression = customExpression
     }
+
+    /// Effective winning direction, applying the `type`-based default.
+    public var lowestWins: Bool { lowerWins ?? (type == .lowestTotal) }
 
     public enum Kind: String, Codable, Equatable {
         case highestTotal

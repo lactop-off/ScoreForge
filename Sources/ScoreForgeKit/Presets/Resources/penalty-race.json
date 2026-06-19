@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "preset.penalty-race",
+  "name": "失点レース（UNO風・最少点勝ち）",
+  "description": "各ラウンドの手札失点を加えていき、誰かが500点に達したら終了。合計失点が最も少ないプレイヤーが勝ち。",
+  "origin": "preset",
+  "iconSystemName": "rectangle.stack",
+  "themeColorHex": "#D7263D",
+  "players": { "min": 2, "max": 10, "default": 4, "teams": false },
+  "structure": "freeform",
+  "fields": [
+    { "id": "penalty", "label": "失点", "type": "integer", "scope": "perPlayer", "default": 0, "min": 0 }
+  ],
+  "actions": [
+    { "id": "addPenalty", "label": "失点を加える", "iconSystemName": "plus.circle", "effects": [
+      { "target": "penalty", "op": "applyExpression", "value": "field('penalty') + input()" }
+    ] }
+  ],
+  "formulas": [
+    { "id": "total", "label": "累計失点", "scope": "perPlayer", "expression": "field('penalty')", "display": true },
+    { "id": "rank", "label": "順位", "scope": "perPlayer", "expression": "rankAsc('total')", "display": true }
+  ],
+  "layout": {
+    "type": "vstack", "spacing": 12, "children": [
+      { "type": "playerHeader" },
+      { "type": "counter", "field": "penalty", "label": "失点", "step": 1 },
+      { "type": "label", "bind": "total", "style": { "fontScale": 1.4, "emphasis": true } },
+      { "type": "actionBar", "actions": ["addPenalty"] }
+    ]
+  },
+  "winCondition": { "type": "firstToReach", "scoreFormula": "total", "target": 500, "lowerWins": true, "tieBreaker": "none" }
+}

@@ -5,7 +5,10 @@ import Foundation
 /// exercise exactly the same decode path as imported and AI-generated schemas.
 public enum Presets {
     /// Resource file names (without extension), in display order.
-    public static let identifiers = ["trick-taking", "points-race", "low-score"]
+    public static let identifiers = [
+        "trick-taking", "points-race", "low-score",
+        "penalty-race", "category-yaku", "double-or-nothing",
+    ]
 
     /// All bundled presets that decode successfully.
     public static var all: [Schema] {

@@ -35,7 +35,7 @@ extension GameRuntime {
             ($0, value(of: condition.scoreFormula, player: $0).asDouble)
         }
 
-        let lowerIsBetter = (condition.type == .lowestTotal)
+        let lowerIsBetter = condition.lowestWins
         let standings = scores
             .sorted { lhs, rhs in
                 let a = lhs.score ?? (lowerIsBetter ? .greatestFiniteMagnitude : -.greatestFiniteMagnitude)
