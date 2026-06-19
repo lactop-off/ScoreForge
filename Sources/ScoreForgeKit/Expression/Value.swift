@@ -44,3 +44,30 @@ public enum Value: Equatable {
         }
     }
 }
+
+/// Tagged JSON encoding so a stored value round-trips unambiguously (a bool is
+/// never mistaken for a number). Used by game-state persistence.
+extension Value: Codable {
+    private enum CodingKeys: String, CodingKey { case type, value }
+    private enum Kind: String, Codable { case number, bool, string, missing }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        switch try c.decode(Kind.self, forKey: .type) {
+        case .number: self = .number(try c.decode(Double.self, forKey: .value))
+        case .bool: self = .bool(try c.decode(Bool.self, forKey: .value))
+        case .string: self = .string(try c.decode(String.self, forKey: .value))
+        case .missing: self = .missing
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .number(let d): try c.encode(Kind.number, forKey: .type); try c.encode(d, forKey: .value)
+        case .bool(let b): try c.encode(Kind.bool, forKey: .type); try c.encode(b, forKey: .value)
+        case .string(let s): try c.encode(Kind.string, forKey: .type); try c.encode(s, forKey: .value)
+        case .missing: try c.encode(Kind.missing, forKey: .type)
+        }
+    }
+}

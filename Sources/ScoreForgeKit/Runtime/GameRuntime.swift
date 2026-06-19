@@ -6,7 +6,7 @@ import Foundation
 /// See docs/design.md §10.1.
 public final class GameRuntime: EvaluationContext {
     public let schema: Schema
-    public private(set) var state: GameState
+    public internal(set) var state: GameState
 
     private let fieldsById: [String: Field]
     private let formulasById: [String: Formula]
@@ -106,7 +106,7 @@ public final class GameRuntime: EvaluationContext {
     /// the field's declared range, then recomputes.
     public func setField(_ id: String, player: Int? = nil, round: Int? = nil, value: Value) {
         guard let field = fieldsById[id] else { return }
-        snapshot()
+        pushUndoState()
         let key = normalizedKey(scope: field.scope, player: player, round: round)
         state.setField(id, at: key, clamped(value, to: field))
         recompute()
@@ -116,7 +116,7 @@ public final class GameRuntime: EvaluationContext {
     /// `input` is exposed to effect expressions via `input()`.
     public func applyAction(_ actionId: String, player: Int? = nil, round: Int? = nil, input: Value? = nil) {
         guard let action = actionsById[actionId] else { return }
-        snapshot()
+        pushUndoState()
         cursorPlayer = player
         cursorRound = round
         cursorInput = input
@@ -167,14 +167,14 @@ public final class GameRuntime: EvaluationContext {
     @discardableResult
     public func addRound() -> Int {
         if let max = schema.rounds?.maxRounds, state.roundCount >= max { return state.roundCount }
-        snapshot()
+        pushUndoState()
         state.roundCount += 1
         recompute()
         return state.roundCount
     }
 
     public func renamePlayer(_ index: Int, to name: String) {
-        snapshot()
+        pushUndoState()
         state.renamePlayer(index, to: name)
     }
 
@@ -227,7 +227,7 @@ public final class GameRuntime: EvaluationContext {
 
     public var canUndo: Bool { !undoStack.isEmpty }
 
-    private func snapshot() {
+    private func pushUndoState() {
         undoStack.append(state)
         if undoStack.count > maxUndo { undoStack.removeFirst() }
     }
