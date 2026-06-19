@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "preset.trick-taking",
+  "name": "トリックテイキング（予想一致ボーナス）",
+  "description": "各ラウンドで予想と実取りが一致したら10点＋取り数。10ラウンド後に合計が最も高い人が勝ち。",
+  "origin": "preset",
+  "iconSystemName": "suit.spade",
+  "themeColorHex": "#2E5BFF",
+  "players": { "min": 2, "max": 6, "default": 4, "teams": false },
+  "structure": "rounds",
+  "rounds": { "fixed": false, "maxRounds": 10 },
+  "fields": [
+    { "id": "bid", "label": "予想", "type": "integer", "scope": "perPlayerPerRound", "default": 0, "min": 0, "max": 13 },
+    { "id": "won", "label": "実取り", "type": "integer", "scope": "perPlayerPerRound", "default": 0, "min": 0, "max": 13 }
+  ],
+  "actions": [
+    { "id": "winTrick", "label": "実取り +1", "iconSystemName": "plus.circle", "effects": [
+      { "target": "won", "op": "add", "value": 1 }
+    ] }
+  ],
+  "formulas": [
+    { "id": "roundScore", "label": "ラウンド得点", "scope": "perPlayerPerRound", "expression": "field('bid') == field('won') ? 10 + field('won') : 0", "display": true },
+    { "id": "total", "label": "合計", "scope": "perPlayer", "expression": "sumRounds('roundScore')", "display": true },
+    { "id": "rank", "label": "順位", "scope": "perPlayer", "expression": "rankDesc('total')", "display": true }
+  ],
+  "layout": {
+    "type": "vstack", "spacing": 12, "children": [
+      { "type": "playerHeader" },
+      { "type": "scoreTable", "rowField": "round", "columnGroup": "player", "cellFields": ["bid", "won", "roundScore"] },
+      { "type": "hstack", "children": [
+        { "type": "stepper", "field": "bid", "label": "予想" },
+        { "type": "counter", "field": "won", "step": 1, "label": "実取り" }
+      ] },
+      { "type": "label", "bind": "total", "style": { "fontScale": 1.4, "emphasis": true } },
+      { "type": "actionBar", "actions": ["winTrick"] }
+    ]
+  },
+  "winCondition": { "type": "afterNRounds", "scoreFormula": "total", "rounds": 10, "tieBreaker": "none" }
+}

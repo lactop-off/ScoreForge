@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "preset.low-score",
+  "name": "最少点（ゴルフ式）",
+  "description": "各ラウンドの打数を記録。合計打数が最も少ないプレイヤーが勝ち。",
+  "origin": "preset",
+  "iconSystemName": "figure.golf",
+  "themeColorHex": "#1DB954",
+  "players": { "min": 1, "max": 8, "default": 4, "teams": false },
+  "structure": "rounds",
+  "rounds": { "fixed": true, "maxRounds": 9 },
+  "fields": [
+    { "id": "strokes", "label": "打数", "type": "integer", "scope": "perPlayerPerRound", "default": 0, "min": 0 }
+  ],
+  "actions": [
+    { "id": "stroke", "label": "打数 +1", "effects": [ { "target": "strokes", "op": "add", "value": 1 } ] }
+  ],
+  "formulas": [
+    { "id": "total", "label": "合計打数", "scope": "perPlayer", "expression": "sumRounds('strokes')", "display": true },
+    { "id": "rank", "label": "順位", "scope": "perPlayer", "expression": "rankAsc('total')", "display": true }
+  ],
+  "layout": {
+    "type": "vstack", "spacing": 12, "children": [
+      { "type": "playerHeader" },
+      { "type": "scoreTable", "rowField": "round", "columnGroup": "player", "cellFields": ["strokes"] },
+      { "type": "counter", "field": "strokes", "step": 1, "label": "打数" },
+      { "type": "label", "bind": "total", "style": { "fontScale": 1.4, "emphasis": true } }
+    ]
+  },
+  "winCondition": { "type": "lowestTotal", "scoreFormula": "total", "tieBreaker": "none" }
+}
