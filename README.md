@@ -39,12 +39,16 @@ Linux／macOS 上で `swift test` により検証できます（iOS 実機・Xco
 未知レイアウトを含むスキーマでも、機械的に修復して **必ず検証を通過する**（受け入れ基準
 「生成に失敗しても必ず編集可能な既定テンプレが提示され、操作不能に陥らない」）状態へ落とし込みます。
 
-### まだ無いもの（次のマイルストーン）
+### まだ無いもの（次のマイルストーン）＝ iOS 側（Mac/Xcode・iOS 26 SDK 必須）
 
-- **SwiftUI レンダラ / 各画面**（§10.2–10.4）— iOS 26 SDK 必須のため別ターゲットで実装予定
-- **AI 生成パイプライン**（§9）— `FoundationModels` 連携（v0.5）
-- **SwiftData 永続化**（§11）— 端末ローカル保存（iOS 側）
-- テンプレ JSON エクスポート/インポートの UI 導線（§3.1, FR-14）
+- **SwiftUI レンダラ / 各画面**（§10.2–10.4）→ 設計メモ: [`docs/renderer-spec.md`](docs/renderer-spec.md)
+- **AI 生成パイプライン**（§9, v0.5）→ 設計メモ: [`docs/generation-pipeline.md`](docs/generation-pipeline.md)
+- **SwiftData 永続化・対局の自動保存/再開・履歴**（§11）→ 設計メモ: [`docs/ios-integration.md`](docs/ios-integration.md)
+- テンプレ JSON エクスポート/インポートの UI 導線（§3.1, FR-14）→ コア API は `TemplateTransfer` で実装済み
+
+> これらの実装ハンドオフ文書は、上記の確定済みコア API（`GameRuntime` / `SchemaValidator` /
+> `SchemaRepair` / `DefaultLayoutBuilder` / `TemplateTransfer` / `Presets`）への配線として
+> 書かれており、Mac 上での iOS 実装をそのまま開始できる。
 
 ---
 
