@@ -24,10 +24,16 @@ Linux／macOS 上で `swift test` により検証できます（iOS 実機・Xco
 | §7.4 / §8.4 | `Runtime/DependencyGraph` | フォーミュラ依存の DAG 構築・トポロジカル順・循環検出 |
 | §10.1 / §7.6 | `Runtime/GameRuntime` | 状態管理・効果適用・再計算・勝敗判定・Undo・ラウンド追加 |
 | §9.5 | `Validation/` | スキーマ検証（参照整合・型・循環・勝利条件・レイアウト縮退） |
+| §9.5 | `Repair/` | スキーマ自動修復・既定レイアウト生成・正規化（必ず動く状態を保証） |
 | FR-15 / §14 | `Presets/` | 同梱プリセット 3 種（トリックテイキング／得点レース／最少点） |
 
-37 件のユニットテストが通過します（式の四則・優先順位・三項・短絡評価・0除算の安全縮退・
-集計／順位・per-player-per-round 集計・クランプ・Undo・各勝利条件・プリセットの往復変換 等）。
+42 件のユニットテストが通過します（式の四則・優先順位・三項・短絡評価・0除算の安全縮退・
+集計／順位・per-player-per-round 集計・クランプ・Undo・各勝利条件・プリセットの往復変換・
+壊れたスキーマの自動修復→検証通過 等）。
+
+`SchemaRepair.repair(_:)` は、未知関数・参照切れ・循環依存・無効なアクション・不正な勝利条件・
+未知レイアウトを含むスキーマでも、機械的に修復して **必ず検証を通過する**（受け入れ基準
+「生成に失敗しても必ず編集可能な既定テンプレが提示され、操作不能に陥らない」）状態へ落とし込みます。
 
 ### まだ無いもの（次のマイルストーン）
 
@@ -60,6 +66,7 @@ Sources/ScoreForgeKit/
   Expression/   式 DSL：Lexer / Parser / AST / Evaluator（§8）
   Runtime/      GameRuntime / GameState / DependencyGraph / WinEvaluator（§10）
   Validation/   SchemaValidator（§9.5）
+  Repair/       SchemaRepair / SchemaNormalizer / DefaultLayoutBuilder（§9.5）
   Presets/      同梱テンプレ（JSON）とローダ
 Tools/scoreforge-cli/   エンジン動作確認用 CLI
 Tests/ScoreForgeKitTests/

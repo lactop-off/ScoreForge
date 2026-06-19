@@ -19,6 +19,33 @@ public indirect enum Expr: Equatable {
         return ids
     }
 
+    /// Every function name invoked anywhere in the expression. Used to detect
+    /// calls outside the whitelist during validation and repair.
+    public var calledFunctionNames: Set<String> {
+        var names: Set<String> = []
+        collectFunctionNames(into: &names)
+        return names
+    }
+
+    private func collectFunctionNames(into names: inout Set<String>) {
+        switch self {
+        case .number, .string, .bool:
+            break
+        case .unary(_, let e):
+            e.collectFunctionNames(into: &names)
+        case .binary(_, let l, let r):
+            l.collectFunctionNames(into: &names)
+            r.collectFunctionNames(into: &names)
+        case .ternary(let c, let a, let b):
+            c.collectFunctionNames(into: &names)
+            a.collectFunctionNames(into: &names)
+            b.collectFunctionNames(into: &names)
+        case .call(let name, let args):
+            names.insert(name)
+            for arg in args { arg.collectFunctionNames(into: &names) }
+        }
+    }
+
     private func collectReferences(into ids: inout Set<String>) {
         switch self {
         case .number, .string, .bool:
